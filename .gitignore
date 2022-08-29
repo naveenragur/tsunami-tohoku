@@ -1,0 +1,10 @@
+_*
+gis/
+bin/*
+lib/*
+__pycache__
+xgeoclaw
+*.png
+.data
+*.log
+*.out
