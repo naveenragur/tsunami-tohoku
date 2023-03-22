@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"
+xmlns:gx="http://www.google.com/kml/ext/2.2">
+<Document><name>Region_100m_850m.kml</name>
+
+<Style id="Path">
+<LineStyle><color>FF00FFFF</color><width>2</width></LineStyle>
+<PolyStyle><color>00000000</color></PolyStyle>
+</Style>
+<Placemark><name>Region_100m_850m</name>
+<description>  x[0] = 140.69, y[0] = 36.78
+  x[1] = 140.84, y[1] = 37.13
+  x[2] = 140.85, y[2] = 37.55
+  x[3] = 140.72, y[3] = 38.19
+  x[4] = 141.2, y[4] = 38.64
+  x[5] = 141.7, y[5] = 39.3
+  x[6] = 141.96, y[6] = 39.76
+  x[7] = 142.7, y[7] = 39.76
+  x[8] = 142.47, y[8] = 39.3
+  x[9] = 142.52, y[9] = 38.64
+  x[10] = 142.38, y[10] = 38.19
+  x[11] = 142.49, y[11] = 37.55
+  x[12] = 141.99, y[12] = 37.13
+  x[13] = 141.73, y[13] = 36.78
+  x[14] = 140.69, y[14] = 36.78
+</description>
+<styleUrl>#Path</styleUrl>
+<Polygon>
+<tessellate>1</tessellate>
+<altitudeMode>clampToGround</altitudeMode>
+<outerBoundaryIs><LinearRing><coordinates>
+
+140.69,36.78,0.
+140.84,37.13,0.
+140.85,37.55,0.
+140.72,38.19,0.
+141.2,38.64,0.
+141.7,39.3,0.
+141.96,39.76,0.
+142.7,39.76,0.
+142.47,39.3,0.
+142.52,38.64,0.
+142.38,38.19,0.
+142.49,37.55,0.
+141.99,37.13,0.
+141.73,36.78,0.
+140.69,36.78,0.
+140.69,36.78,0.
+
+</coordinates></LinearRing></outerBoundaryIs>
+</Polygon>
+</Placemark>
+
+</Document>
+</kml>
