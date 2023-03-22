@@ -3,7 +3,7 @@ _*
 gis/
 !gis/slab_dtopo_list2run4footprint.csv
 !gis/slab_dtopo_list2run.csv
-!_results/_scripts_DART
+!_results/_scripts_DART*
 bin/*
 lib/*
 __pycache__
