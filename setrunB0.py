@@ -494,6 +494,61 @@ def setgeo(rundata):
     fg.interp_method = 0  # 0 ==> pw const in cells, recommended
     fgmax_grids.append(fg)  # written to fgmax_grids.data
 
+     # Now append to this list objects of class fgmax_tools.FGmaxGrid
+    # specifying any fgmax grids.
+    if making_inundation:
+        tstart_max = 0.  # for making max depth
+        dx150 = 0.00135
+        dx050 = 0.00045
+
+        ###### Sendai Bay
+        # Points on a uniform 2d grid:
+        fg = fgmax_tools.FGmaxGrid()
+        fg.point_style = 2  # uniform rectangular x-y grid
+        fg.x1 = 140.85 + dx050 / 2.0
+        fg.x2 = 141.09 - dx050 / 2.0
+        fg.y1 = 37.76 + dx050 / 2.0
+        fg.y2 = 38.33 - dx050 / 2.0
+        fg.dx = dx050  # 50m level
+        fg.min_level_check = 4
+        fg.tstart_max = tstart_max
+        fg.tend_max = 1.e10  # when to stop monitoring max values
+        fg.dt_check = 30.  # how often to update max values
+        fg.interp_method = 0  # 0 ==> pw const in cells, recommended
+        fgmax_grids.append(fg)  # written to fgmax_grids.data
+
+        # # ###### Ishinomaki Bay
+        # Points on a uniform 2d grid:
+        fg = fgmax_tools.FGmaxGrid()
+        fg.point_style = 2  # uniform rectangular x-y grid
+        fg.x1 = 141.14 + dx050 / 2.0
+        fg.x2 = 141.39 - dx050 / 2.0
+        fg.y1 = 38.35 + dx050 / 2.0
+        fg.y2 = 38.49 - dx050 / 2.0
+        fg.dx = dx050  # 50m level
+        fg.min_level_check = 4
+        fg.tstart_max = tstart_max
+        fg.tend_max = 1.e10  # when to stop monitoring max values
+        fg.dt_check = 30.  # how often to update max values
+        fg.interp_method = 0  # 0 ==> pw const in cells, recommended
+        fgmax_grids.append(fg)  # written to fgmax_grids.data
+
+        # ####### Rikuzentakata Bay
+        # # Points on a uniform 2d grid:
+        fg = fgmax_tools.FGmaxGrid()
+        fg.point_style = 2  # uniform rectangular x-y grid
+        fg.x1 = 141.59 + dx050 / 2.0
+        fg.x2 = 141.69 - dx050 / 2.0
+        fg.y1 = 38.96 + dx050 / 2.0
+        fg.y2 = 39.04 - dx050 / 2.0
+        fg.dx = dx050  # 50m level
+        fg.min_level_check = 4
+        fg.tstart_max = tstart_max
+        fg.tend_max = 1.e10  # when to stop monitoring max values
+        fg.dt_check = 30.  # how often to update max values
+        fg.interp_method = 0  # 0 ==> pw const in cells, recommended
+        fgmax_grids.append(fg)  # written to fgmax_grids.data
+
     return rundata
     # end of function setgeo
     # ----------------------

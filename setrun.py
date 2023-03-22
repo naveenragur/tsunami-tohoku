@@ -12,7 +12,6 @@ from clawpack.amrclaw import region_tools
 from clawpack.geoclaw import fgmax_tools
 from clawpack.amrclaw.data import FlagRegion
 
-
 try:
     CLAW = os.environ['CLAW']
     HOME = os.environ['HOME']
@@ -33,7 +32,7 @@ if not os.path.isdir(topodir):
 
 # initial run without a tsunami forcing to derive bathymetry
 making_B0 = False
-making_DART = False
+making_DART = True
 making_inundation = True
 print("Simulation for with no displacement :", making_B0, " and DART buoys :", making_DART)
 
@@ -96,6 +95,7 @@ def setrun(claw_pkg='geoclaw'):
         clawdata.upper[0] = 145.0  # xupper
         clawdata.lower[1] = 34.0  # ylower
         clawdata.upper[1] = 42.0  # yupper
+    
     # Res of raw data {"2700":.02430, "1350": 0.01215, "0450" : 0.00405, "0150" : 0.00135, "0050": 0.00045}
     # 2700  = 2*0.01215/2 level 1
     # 1350  = 0.01215/3 level 2
@@ -154,8 +154,8 @@ def setrun(claw_pkg='geoclaw'):
             clawdata.tfinal = 1.  # for making B0
             clawdata.output_t0 = True  # for making B0
         else:
-            clawdata.num_output_times = 7
-            clawdata.tfinal = 6 * 3600.
+            clawdata.num_output_times = 1
+            clawdata.tfinal = 1#6 * 3600.
             clawdata.output_t0 = True  # output at initial (or restart) time?
 
     elif clawdata.output_style == 2:
@@ -640,7 +640,7 @@ def setgeo(rundata):
         fg.x2 = 141.09 - dx050 / 2.0
         fg.y1 = 37.76 + dx050 / 2.0
         fg.y2 = 38.33 - dx050 / 2.0
-        fg.dx = dx050  # 150m level
+        fg.dx = dx050  # 50m level
         fg.min_level_check = 4
         fg.tstart_max = tstart_max
         fg.tend_max = 1.e10  # when to stop monitoring max values

@@ -32,7 +32,6 @@ def M0_2_Mw(M0, constant=9.05):
 
 def Mw_2_RuptureDim(Mw):
 #    Strasser, F. O., Arango, M. C., & Bommer, J. J. (2010).
-
     area_absigma = [-3.476, 0.952, 0.304]
     width_absigma = [-0.882, 0.351, 0.173]
     length_absigma = [-2.477, 0.585, 0.180]

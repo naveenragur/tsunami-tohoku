@@ -28,7 +28,7 @@ dtopo_batch = os.listdir(dtopodir)
                # 'Hayes.txydz', 'Fujii.txydz', 'HAYES2011.tt3', 'YAMAZAKI2018_TPMOD_Static.tt3',
                # 'YAMAZAKI2018_TPMOD.tt3', 'SATAKE2013.tt3', 'Caltech.txydz', 'GusmanAU.txydz', 'HAYES2017.tt3',
                # 'SATAKE2013_Static.tt3']
-# dtopo_batch = ['GusmanAU.txydz']
+dtopo_batch = ['SANRIKU1933.tt3']
 
 print(dtopo_batch)
 
@@ -43,8 +43,8 @@ def job1(threadid):
         inpfile = q.get_nowait()
         print("Thread ", threadid, " Starts job to plot ", inpfile)
         p2 = plotclaw(outdir=outdir, plotdir=plotdir, dtopo=inpfile)
-        # print("Thread ", threadid, " Starts job to process fgmax ", inpfile)
-        # p3 = process_fg_max(outdir=outdir, plotdir=plotdir, dtopo=inpfile, save_figs=True, testdata=False)
+        print("Thread ", threadid, " Starts job to process fgmax ", inpfile)
+        p3 = process_fg_max(outdir=outdir, plotdir=plotdir, dtopo=inpfile, save_figs=True, testdata=False)
 
 # Main Code:
 threads = []

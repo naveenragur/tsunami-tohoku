@@ -27,7 +27,7 @@ dtopo_batch = os.listdir(dtopodir)
 # 'YUE2013.tt3', 'UCSB3.txydz', 'GCMT.txydz', 'YAMAZAKI2011.tt3', 'YAMAZAKI2018_TMOD_Static.tt3', 'YAMAZAKI2018_TMOD.tt3',
 # 'Hayes.txydz', 'Fujii.txydz', 'HAYES2011.tt3', 'YAMAZAKI2018_TPMOD_Static.tt3', 'YAMAZAKI2018_TPMOD.tt3', 'SATAKE2013.tt3',
 # 'Caltech.txydz', 'GusmanAU.txydz', 'HAYES2017.tt3', 'SATAKE2013_Static.tt3']
-#dtopo_batch = ['FUJI2011_42.tt3']
+dtopo_batch = ['TEST.tt3']
 
 print(dtopo_batch)
 # Queue containing input dtopo file for parallel  geoclaw jobs:
@@ -40,7 +40,7 @@ def job1(threadid):
     while not q.empty():
         inpfile = q.get_nowait()
         print("Thread ", threadid, " Starts job to run ", inpfile)
-        p1 = runclaw(xclawcmd=exe, outdir=outdir, rundir=rundir, dtopo=inpfile)
+        # p1 = runclaw(xclawcmd=exe, outdir=outdir, rundir=rundir, dtopo=inpfile)
         # print("Thread ", threadid, " Starts job to plot ", inpfile)
         # p2 = plotclaw(outdir=outdir, plotdir=plotdir, dtopo=inpfile)
         # print("Thread ", threadid, " Starts job to process fgmax ", inpfile)
