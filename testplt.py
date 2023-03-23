@@ -34,4 +34,5 @@ shore = np.load(shorelines_file)
 fault.plot_subfaults(plot_rake=True)
 fault.plot_subfaults(slip_color=True)
 plt.plot(shore[:, 0], shore[:, 1], 'g')
-plt.show()
+plt.show() #to print plot on screen
+
