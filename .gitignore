@@ -10,6 +10,8 @@ gis/*
 !gis/slab_dtopo_list2run.csv
 !gis/Historic.csv
 
+_tsunami/*
+
 
 bin/*
 lib/*

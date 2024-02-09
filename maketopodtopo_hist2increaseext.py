@@ -8,8 +8,6 @@ from __future__ import print_function
 from clawpack.geoclaw import dtopotools, topotools
 from matplotlib import pyplot as plt
 import math, pandas, os, numpy, glob
-from scipy.stats import skewnorm
-
 
 try:
     CLAW = os.environ['CLAW']
@@ -63,7 +61,7 @@ def make_dtopo(EveID, EveMw, EveLat, EveLon, EveDep, EveRak, EveStr ,EveDip, mak
     dtopo_fname = os.path.join(DtopoDir,EveID + '.tt3')
     png_fname = os.path.join(PngDir, EveID + '.png')
     asc_fname = os.path.join(ASCDir, EveID + '.asc')
-    prj_fname = os.path.join(ASCDir, EveID + 'prj')
+    prj_fname = os.path.join(ASCDir, EveID + '.prj')
 
     # For tohoku source defined by [Hayes (USGS, Tohoku 2011) ] , DIP= 10.21 degree, STRIKE = 194 degree and RAKE = 87.52 degree
     #create a subfault
@@ -143,16 +141,20 @@ def make_dtopo(EveID, EveMw, EveLat, EveLon, EveDep, EveRak, EveStr ,EveDip, mak
 
 
 def make_hisdtopo(tohoku_subfaults, fname, makeplots=False,makeasc=True):
-    dtopo_fname = os.path.join(DtopoDir, fname + '.tt3')
-    png_fname = os.path.join(PngDir, fname + '.png')
-    asc_fname = os.path.join(ASCDir, fname + '.asc')
-    prj_fname = os.path.join(ASCDir, fname + '.prj')
+    dtopo_fname = os.path.join(DtopoDir, fname + '_2.tt3')
+    png_fname = os.path.join(PngDir, fname + '_2.png')
+    asc_fname = os.path.join(ASCDir, fname + '_2.asc')
+    prj_fname = os.path.join(ASCDir, fname + '_2.prj')
 
+    # GRID_SIZ = 0.01215
+    # X0, X1 = 139, 145
+    # Y0, Y1 = 34, 42
+    # X0, X1 = 132, 145
+    # Y0, Y1 = 32, 42
     GRID_SIZ = 0.01215
-    X0, X1 = 139, 145
-    Y0, Y1 = 34, 42
-    X0, X1 = 132, 145
-    Y0, Y1 = 32, 42
+    X0, X1 = 135, 150
+    Y0, Y1 = 30, 45
+
 
     XUNITS = round((X1 - X0) / GRID_SIZ)
     YUNITS = round((Y1 - Y0) / GRID_SIZ)
@@ -328,172 +330,80 @@ def get_topo(makeplots=False):
             plt.close('all')
             print("Created plot for:", fname)
 
-def modelslip(fault,avgslip):
-    """
-    for a given no of fault and avg slip, calculate the varying slip distributions for events to model
-    example : 6 faults and 5 m avg slip to be distributed over 12 subfaults
-    """
-    vars=[2,-2,4,-4,6,-6,8,-8,10,-10,12,-12]
-    Avals=vars[0:fault] #variations of slip among faults
-    moves =  12 - fault + 1 #7 if faults used are 6 out of 12
-    data_all = numpy.zeros((fault * moves,12))
-    row,col = 0,0
-    for m in range(moves):
-        for a in Avals:
-            # print('fault position',col, 'slip variation',row)
-            x = numpy.linspace(skewnorm.ppf(0.1, a),skewnorm.ppf(0.9, a), fault)
-            rv = skewnorm(a)
-            slips = rv.pdf(x)*avgslip/numpy.mean(rv.pdf(x))
-            data_all[row,col:col+fault] = slips
-            row += 1
-        col += 1 
-    return data_all
-
-def make_siftdtopo(EveID,filepath, makeplots=False,makeasc=False):
-    """
-    read subfault file and make siftdtopo file, also return info on magnitude of event
-    """
-    # read subfault file
-    input_units = {"length":"km", "width":"km", "depth":"km", "slip":"m"}
-    fault = dtopotools.CSVFault()
-    fault.read(filepath, input_units=input_units, coordinate_specification='bottom center')
-    subfaults = numpy.loadtxt(filepath, skiprows=1,delimiter =',',usecols=(0,1,2,3,4,5,6,7,8))
-    index = int(numpy.where(subfaults[:,8] == numpy.amax(subfaults[:,8]))[0])
-  
-    # max slip info
-    EveLat = subfaults[index,0]
-    EveLon = subfaults[index,1]
-    EveDep = round(subfaults[index,2],2)
-    EveStr = round(subfaults[index,5],2)
-    EveDip = round(subfaults[index,6],2)
-    EveRak = subfaults[index,7]
-    EveMw = round(fault.Mw(),2)
-
-    GRID_SIZ = 0.01215
-    X0, X1 = 135, 150
-    Y0, Y1 = 30, 45
-
-    XUNITS = round((X1 - X0) / GRID_SIZ)
-    YUNITS = round((Y1 - Y0) / GRID_SIZ)
-
-    dtopo_fname = os.path.join(DtopoDir,EveID + '.tt3')
-    png_fname = os.path.join(PngDir, EveID + '.png')
-    asc_fname = os.path.join(ASCDir, EveID + '.asc')
-    prj_fname = os.path.join(ASCDir, EveID + 'prj')
-
-    # create a fault and add the above single subfault to it
-    x = numpy.linspace(X0, X1, XUNITS)
-    y = numpy.linspace(Y0, Y1, YUNITS)
-    times = [1.]
-
-    fault.create_dtopography(x, y, times)
-    dtopo = fault.dtopo
-    dtopo.write(dtopo_fname, dtopo_type=3)
-    print("Created ", dtopo_fname)
-
-    tt3_file = open(dtopo_fname, "r")
-    lines = tt3_file.readlines()
-    tt3_file.close()
-    asc_file = open(asc_fname, "w")
-    asc_file.write('ncols ' + str.split(lines[0])[0] + '\n')
-    asc_file.write('nrows ' + str.split(lines[1])[0] + '\n')
-    asc_file.write('xllcorner ' + str.split(lines[3])[0] + '\n')
-    asc_file.write('yllcorner ' + str.split(lines[4])[0] + '\n')
-    asc_file.write('cellsize ' + str(GRID_SIZ) + '\n')
-    asc_file.write('nodata_value -32768' + '\n')
-
-    for line in lines[9:]:
-        asc_file.write(line)
-    asc_file.close()
-    print("Created ", asc_fname)
-
-    prjline = 'GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137.0,298.257223563]],' \
-              'PRIMEM["Greenwich",0.0],UNIT["Degree",0.0174532925199433]]'
-    with open(prj_fname, 'w') as f:
-        f.write(prjline)
-
-    if makeplots:
-        shore = numpy.load(shorelines_file)
-        plt.figure(figsize=(12, 7))
-        ax1 = plt.subplot(121)
-        ax2 = plt.subplot(122)
-        fault.plot_subfaults(axes=ax1, slip_color=True)
-        ax1.plot(EveLon, EveLat, 'ro')
-        ax1.text(142, 32, ('ID:' + str(EveID)), fontsize=11)
-        ax1.text(142, 31.2, ('Loc:' + str("{:.3f}".format(EveLat)) + ',' + str("{:.3f}".format(EveLon))), fontsize=11)
-        ax1.text(142, 30.4, ('Mw,Depth :' + str(EveMw) + ',' + str(EveDep) + 'km'), fontsize=11)
-        ax1.plot(shore[:, 0], shore[:, 1], 'g')
-        ax1.set_xlim(x.min(), x.max())
-        ax1.set_ylim(y.min(), y.max())
-        dtopo.plot_dZ_colors(1., axes=ax2)
-        ax2.plot(EveLon, EveLat, 'ro')
-        ax2.text(142, 32, ('Dip:' + str(EveDip) + ' degree'), fontsize=11)
-        ax2.text(142, 31.2, ('Rak:' + str(EveRak) + ' degree'), fontsize=11)
-        ax2.text(142, 30.4, ('Str:' + str(EveStr) + ' degree'), fontsize=11)
-        ax2.plot(shore[:, 0], shore[:, 1], 'g')
-        ax2.set_xlim(x.min(), x.max())
-        ax2.set_ylim(y.min(), y.max())
-        plt.savefig(png_fname)
-        plt.clf()
-        plt.close('all')
-        print("Created ", png_fname)
-
-    return fault.Mw()
 
 if __name__ == "__main__":
     # Directory for storing topo and dtopo files:
-    DtopoDir = os.path.join(root_dir, 'gis', 'dtopo_sift')
+    DtopoDir = os.path.join(root_dir, 'gis', 'dtopo_his')
     TopoDir = os.path.join(root_dir, 'gis', 'topo', 'ASC')
     PngDir = os.path.join(DtopoDir, 'dtopopng')
     ASCDir = os.path.join(DtopoDir, 'dtopoasc')
-    FilDir = os.path.join(DtopoDir, 'dtopofil')
     os.makedirs(DtopoDir, exist_ok=True)
     os.makedirs(PngDir, exist_ok=True)
     os.makedirs(ASCDir, exist_ok=True)
-    os.makedirs(FilDir, exist_ok=True)
     shorelines_file = root_dir + '/gis/coastlines/JPshoreline_xy.npy'
 
-########################### DTOPO FILES ########################################
+########################### DTOPO FILES ################################
+# -----------------------------------------------------------------------------------------------------------------------
+    # # 2011 historic event in Tohoku Region v2
+    # fnames = glob.glob(root_dir + '/gis/2011/source/_input2script/*.csv*')
+    # fnames.remove(root_dir + '/gis/2011/source/_input2script/SATAKE2013.csv')
+
+    fnames = ['FUJI2011_42','YAMAZAKI2018_TPMOD_Static','SANRIKU1896','SANRIKU1933','TOKACHI1968']
+    for count, name in enumerate(fnames):
+        fname = root_dir + '/gis/2011/source/_input2script/' + name +'.csv'
+        subfaultdf = pandas.read_csv(fname)
+        print('processing file',count,fname.split('/')[-1][:-4])
+        make_hisdtopo(subfaultdf, fname.split('/')[-1][:-4], False, True)
+
+# -----------------------------------------------------------------------------------------------------------------------
+#      # # Sythetic Events in Tohoku Region based on TMOD from YAMAZAKI 2018
+#     subfaultdf = pandas.read_csv(os.path.join(root_dir, 'gis', '2011', 'source', '_input2script', 'YAMAZAKI2018_TMOD.csv'))
+#     MW_VALS = [7.5, 8, 8.5, 9]
+#     COMPILE = pandas.DataFrame(columns=['EveID', 'EveMw', 'EveLat', 'EveLon', 'EveDep', 'EveRak', 'EveStr', 'EveDip'])
+#     id = 1
+#     for EveMw in MW_VALS:
+#         for i in range(len(subfaultdf)):
+#             #generate event ids
+#             EveID = str('SC_' + format(id, '04d'))
+#             id += 1
+#
+#             # create a compilation with event details
+#             COMPILE = COMPILE.append({'EveID': EveID, 'EveMw': EveMw,'EveLat': subfaultdf.LAT[i],
+#                                       'EveLon': subfaultdf.LON[i], 'EveDep': subfaultdf.D[i],
+#                                       'EveRak': subfaultdf.RAKE[i], 'EveStr': subfaultdf.STRIKE[i],
+#                                       'EveDip': subfaultdf.DIP[i]}, ignore_index=True)
+#
+#             #create dtopo files
+#             make_dtopo(EveID, EveMw, subfaultdf.LAT[i], subfaultdf.LON[i], subfaultdf.D[i], subfaultdf.RAKE[i],
+#                        subfaultdf.STRIKE[i], subfaultdf.DIP[i], makeplots=True)
+#
+#     COMPILE.to_csv(os.path.join(DtopoDir, 'tohoku_dtopo_list.csv'), sep=',', header=True, index=None, mode='w')
+
 # -----------------------------------------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------------------------------------
-    ## Sythetic Events in Tohoku Region based on sift source data
-    fname = root_dir + '/gis/GEM/sourceparameters_sift.csv' 
-    siftfaults = pandas.read_csv(fname) # Longitude	Latitude Depth(km) Length Width	Strike Dip Rake	UnitSrc Slip
-    id = 595
+    #  # # Sythetic Events in Tohoku Region based on SLAB.2 data and custom source region with points at .25 degree spacing
+    # subfaultdf = pandas.read_csv(os.path.join(root_dir, 'gis', 'GEM', 'sourceparameters.csv'))
+    # MW_VALS = [7.5, 8, 8.5, 9, 9.5]
+    # COMPILE = pandas.DataFrame(columns=['EveID', 'EveMw', 'EveLat', 'EveLon', 'EveDep', 'EveRak', 'EveStr', 'EveDip'])
+    # id = 0
+    # for EveMw in MW_VALS:
+    #     for i in range(len(subfaultdf)):
+    #         #generate event ids
+    #         EveID = str('SL_' + format(id, '04d'))
+    #         id += 1
 
-    siftfault_list = os.path.join(DtopoDir,'sift_dtopo_list.csv')
-    COMPILE = pandas.DataFrame(columns=['EveID', 'Filename'])
+    #         # create a compilation with event details
+    #         COMPILE = COMPILE.append({'EveID': EveID, 'EveMw': EveMw,'EveLat': subfaultdf.lat[i],
+    #                                   'EveLon': subfaultdf.lon[i], 'EveDep': abs(subfaultdf.dep[i]),
+    #                                   'EveRak': subfaultdf.rak[i], 'EveStr': subfaultdf.str[i],
+    #                                   'EveDip': subfaultdf.dip[i]}, ignore_index=True)
 
-    faults = [6, 8, 10, 12] #no of faults to be used
-    for fault in faults:
-        avgslp = [10, 15, 20, 25] #avg slip to be distributed
-        if fault == 6:
-            avgslp = avgslp[0:1]
-        elif fault == 8:
-            avgslp = avgslp[0:2]
-        elif fault == 10:
-            avgslp = avgslp[1:2]
-        elif fault == 12:
-            avgslp = avgslp[1:3]
-        for slip in avgslp:
-            scenarios = modelslip(fault,slip)
-            for scene in scenarios: #create fault file and add to the list 
-                print('Processing Event:',id)
-                siftfaults['Slip']=scene
-                
-                evefname = FilDir + '/SL_{:04d}.csv'.format(id)  # subfault file name for the event
-                EveID ='SL_{:04d}'.format(id)
-                siftfaults.to_csv(evefname, index=False)
-             
-                EveMw = make_siftdtopo(EveID,evefname, makeplots=True, makeasc=True)
-                COMPILE = COMPILE.append({'EveID': EveID,'EveMw': EveMw, 'Filename': evefname}, ignore_index=True)
-                id += 1
-    COMPILE.to_csv(siftfault_list, sep=',', header=True, index=None, mode='w')
+    #         #create dtopo files
+    #         make_dtopo(EveID, EveMw, subfaultdf.lat[i], subfaultdf.lon[i], abs(subfaultdf.dep[i]), subfaultdf.rak[i],
+    #                    subfaultdf.str[i], subfaultdf.dip[i], makeplots=True)
 
+    # COMPILE.to_csv(os.path.join(DtopoDir, 'slab_dtopo_list.csv'), sep=',', header=True, index=None, mode='w')
 
-
-
-
-
-    
-
+# -----------------------------------------------------------------------------------------------------------------------
+#     TOPO FILES
+#     get_topo(True)

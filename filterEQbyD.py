@@ -17,6 +17,6 @@ for row in len(EQdtopo):
         TEST=True
 else:
     TEST=False
-    
-        EQdtopo.drop(row,inplace=True)
+
+    EQdtopo.drop(row,inplace=True)
 
