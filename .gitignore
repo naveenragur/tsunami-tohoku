@@ -23,4 +23,4 @@ xgeoclaw
 *.png
 .data
 *.log
-*.out
+*.outc
