@@ -477,6 +477,8 @@ if __name__ == "__main__":
             avgslp = avgslp[1:3]
         for slip in avgslp:
             scenarios = modelslip(fault,slip)
+            #print count of scenarios per fault count
+            print('Faults:',fault,'AvgSlip:',slip,'Scenarios:',scenarios.shape[0])
             for scene in scenarios: #create fault file and add to the list 
                 print('Processing Event:',id)
                 siftfaults['Slip']=scene
@@ -490,7 +492,12 @@ if __name__ == "__main__":
                 id += 1
     COMPILE.to_csv(siftfault_list, sep=',', header=True, index=None, mode='w')
 
-
+#Faults: 6 AvgSlip: 10 Scenarios: 42
+# Faults: 8 AvgSlip: 10 Scenarios: 40
+# Faults: 8 AvgSlip: 15 Scenarios: 40
+# Faults: 10 AvgSlip: 15 Scenarios: 30
+# Faults: 12 AvgSlip: 15 Scenarios: 12
+# Faults: 12 AvgSlip: 20 Scenarios: 12
 
 
 
